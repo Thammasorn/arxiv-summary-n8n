@@ -1,0 +1,1587 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fa0fd82a-03cb-4adb-91b9-c614cefb0bc2",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "http://export.arxiv.org/api/query?search_query=all:RAG&start=0&max_results=20&sortBy=submittedDate&sortOrder=descending",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "26486775-04f3-4ca4-abb7-71072a436d7b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        440,
+        0
+      ],
+      "id": "b5821d27-56f1-4152-b6a5-82be61e21381",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return _input.first().json.feed.entry"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "95953e76-fa5a-43e2-8044-5b9b168e4a97",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.title }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "survey_paper",
+              "description": "Paper that has the main objective  to review and summarize other papers"
+            },
+            {
+              "category": "benchmark_paper",
+              "description": "paper that has the main objective to benchmark other papers (e.g. test other papers on some dataset)"
+            },
+            {
+              "category": "new_solution",
+              "description": "paper that propose the new methodology or new research"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        0
+      ],
+      "id": "c34d2c7a-c824-452e-a26d-12f624281aa6",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        980,
+        220
+      ],
+      "id": "dafb9d73-14b3-4051-af0c-0bd9d46e90e9",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ywJtRNsVX5D7vkiU",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=http://arxivapi:8000/arxiv/{{$json.id.split(\"/\").last()}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1280,
+        120
+      ],
+      "id": "55f5a3c5-ebb2-4437-a90f-9c290eb79b6d",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "=http://arxivapi:8000/arxiv/{{$json.id.split(\"/\").last()}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1280,
+        -180
+      ],
+      "id": "a1ae272e-57f7-477e-b98a-105e21abb9a7",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c336342b-df48-4c8a-907f-c7f41318f2f1",
+              "leftValue": "={{ $json.title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1500,
+        120
+      ],
+      "id": "8709ef91-b486-4d01-ba9d-d882321b7af5",
+      "name": "If html available (new method)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c336342b-df48-4c8a-907f-c7f41318f2f1",
+              "leftValue": "={{ $json.title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1500,
+        -180
+      ],
+      "id": "b70b934a-8a2e-4686-85bf-29b901632136",
+      "name": "If html available (bechmark)"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        340
+      ],
+      "id": "1bb36180-97de-49aa-a1c7-cdd7100a88e3",
+      "name": "OpenRouter Chat Model5",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ywJtRNsVX5D7vkiU",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\"problem_statement\":[\"list of section_title\"],\n\"literature_review\":[\"list of section_title\"],\n\"methodology\":[\"list of section_title\"],\n\"result\":[\"list of section_title\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2020,
+        340
+      ],
+      "id": "45821eaf-e596-47bd-8704-446abba815d0",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the research title {{ $json.title }}\n\nBelow are abstract\n{{ $json.abstract }}\n\nBelow are the list of topic\n{{ $json.sections.map(section => section.section_title).join('\\n') }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are the paper reviewer, You tasks is to group the section in the research paper to the topic below\n1.) problem statement and main objective \n2.) literature review and research gap\n3.) methodology\n4.) result\n\nPlease answer in json format\n{\n\"problem_statement\":[\"list of section_title\"],\n\"literature_review\":[\"list of section_title\"],\n\"methodology\":[\"list of section_title\"],\n\"result\":[\"list of section_title\"],\n}\n\nPlease note that one section can be under more than 1 parts \n\nPlease return the name of section as it shown in input without any editing or modifying (e.g. please not remove the section number in front of the name)"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1780,
+        120
+      ],
+      "id": "82ecaea1-1667-4c72-8d5f-f29fad64d57b",
+      "name": "Topic Segmentation"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nlet result = [];\nfor (let i = 0; i < $input.all().length; i++) {\n  let all_sections = $(\"If html available (new method)\").all()[i].json.sections\n  // Problem Statement\n  let problem_statement_sections_title = $input.all()[i].json.output.problem_statement\n  let problem_statement_sections = all_sections.filter(section =>\n    problem_statement_sections_title.includes(section.section_title)\n  );\n  // Lit Review\n  let list_review_section_title = $input.all()[i].json.output.literature_review\n  let list_review_sections = all_sections.filter(section =>\n    list_review_section_title.includes(section.section_title)\n  );\n  // Methodology\n  let method_section_title = $input.all()[i].json.output.methodology\n  let method_sections = all_sections.filter(section =>\n    method_section_title.includes(section.section_title)\n  );\n  // Result\n  let result_section_title = $input.all()[i].json.output.result\n  let result_sections = all_sections.filter(section =>\n    result_section_title.includes(section.section_title)\n  );\n  result[i] = {\n    'problem_statement': problem_statement_sections,\n    'literature_review': list_review_sections,\n    'methodology': method_sections,\n    'result': result_sections\n  }\n}\n\nreturn result"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2140,
+        120
+      ],
+      "id": "04227a42-8e66-4a01-8695-02b53f38e4b7",
+      "name": "Section Aggregator"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        340
+      ],
+      "id": "acc9b13b-86f9-4f18-bc8e-dc2ab792cc6d",
+      "name": "OpenRouter Chat Model6",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ywJtRNsVX5D7vkiU",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "\n{\n  \"content\": [\"list of summarization bullet\"],\n  \"image\": [\"list of image url that related to your summarization\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2780,
+        340
+      ],
+      "id": "f4181de2-2b76-4621-8d0e-9b6a0cbbf5f1",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Below are an abstract of the paper\n{{ $('If html available (new method)').item.json.abstract }}\n\nBelow are the related section in json format \n{{ $json.problem_statement.toJsonString()}}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a team member of research lab who doing research on RAG system.\nYou have to read an abstract and the given related section in paper in order to summarize the problem statement and objective of each paper\n\nBelow are the example questions that you should answer in your response\nWhat is the main problem this paper is trying to solve? \nWhat is the primary objective or goal of the research? \n\nPlease be very detailed on this topic (objective is to allow reader to understand the specific of problem in problem statement and goal of this paper)\n\nAlso noted that, there will be image in each section, you can read the caption and choose some of them to show in your response\n\nPlease response in json format\n\n{\n\"content\": [\"list of summarization bullet\"],\n\"image\": [\"list of image url that related to your summarization please should only 1-2 most important images\"]\n}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        2540,
+        120
+      ],
+      "id": "8a987b38-7224-4f69-95ae-fe855f552cd8",
+      "name": "Objective Summarization",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 3
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2660,
+        740
+      ],
+      "id": "f93d9081-59f6-45f4-805d-cec81e7b21c1",
+      "name": "OpenRouter Chat Model7",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ywJtRNsVX5D7vkiU",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "\n{\n  \"content\": [\"list of summarization bullet\"],\n  \"image\": [\"list of image url that related to your summarization\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2800,
+        740
+      ],
+      "id": "f67e22b8-9242-4a38-a8e4-67fdb7aa1e56",
+      "name": "Structured Output Parser4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Below are an abstract of the paper\n{{ $('If html available (new method)').item.json.abstract }}\n\nBelow are the summarization of objective and problem statement of this paper\n{{ $json.output.content }}\n\nBelow are the related section in json format\n{{ $('Section Aggregator').item.json.literature_review.toJsonString() }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a team member of research lab who doing research on RAG system.\nYou have to read an abstract and the summary of problem statement and objective and the given related section in paper in order to summarize the related work and the research gap that this research want to fill in\n\nBelow are the example questions that you should answer in your response\n- What are the existing methods or prior research in this area?\n- What specific gap or limitation in prior work is this paper addressing?\n\nAlso noted that, there will be image in each section, you can read the caption and choose some of them to show in your response\n\nPlease response in json format\n\n{\n\"content\": [\"list of summarization bullet\"],\n\"image\": [\"list of image url that related to your summarization please should only 1-2 most important images\"]\n}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        2560,
+        520
+      ],
+      "id": "c210a475-7845-42f5-a2bb-e4860e39db05",
+      "name": "Related Work Summarization",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2660,
+        1120
+      ],
+      "id": "1fb5982a-1027-4e41-a8b8-0bd3610a9117",
+      "name": "OpenRouter Chat Model8",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ywJtRNsVX5D7vkiU",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "\n{\n  \"content\": [\"list of summarization bullet\"],\n  \"image\": [\"list of image url that related to your summarization\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2960,
+        1120
+      ],
+      "id": "95e63d7e-f0c4-453a-9bdb-5ac824f6e1b0",
+      "name": "Structured Output Parser5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Below are an abstract of the paper\n{{ $('If html available (new method)').item.json.abstract }}\n\nBelow are the summarization of objective and problem statement of this paper\n{{ $('Objective Summarization').item.json.output.content }}\n\nBelow are the summarization of related work and research gap\n{{ $json.output.content }}\n\nBelow are the related section in json format\n{{ $('Section Aggregator').item.json.methodology.toJsonString() }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a team member of research lab who doing research on RAG system.\nYou have to read an abstract and the summary of previous sections and the given related section in paper in order to summarize the method or the algorithm that this paper proposes to solve the problem statement or to fill in the research gap\n\nBelow are the example questions that you should follow below manner\n   - Explain the proposed approach in a clear, step-by-step manner.\n   - For each step, describe the reasoning or rationale behind it.\n\nPlease be very detailed on this section\n\nAlso noted that, there will be image in each section, you can read the caption and choose some of them to show in your response\n\nPlease response in json format\n\n{\n\"content\": [\"list of summarization bullet\"],\n\"image\": [\"list of image url that related to your summarization please should only 1-2 most important images\"]\n}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        2580,
+        900
+      ],
+      "id": "f7b9c6b7-2340-46a9-8715-a61f523586b1",
+      "name": "Methodology Summarization",
+      "retryOnFail": true,
+      "waitBetweenTries": 3
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        1500
+      ],
+      "id": "9c374ccd-f4bd-4293-9753-9e2b9e2752fb",
+      "name": "OpenRouter Chat Model9",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ywJtRNsVX5D7vkiU",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "\n{\n  \"content\": [\"list of summarization bullet\"],\n  \"image\": [\"list of image url that related to your summarization\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2820,
+        1500
+      ],
+      "id": "9b1ca7a0-5c60-4644-8b93-568bb0e669c5",
+      "name": "Structured Output Parser6"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Below are an abstract of the paper\n{{ $('If html available (new method)').item.json.abstract }}\n\nBelow are the summarization of objective and problem statement of this paper\n{{ $('Objective Summarization').item.json.output.content }}\n\nBelow are the summary of related work and research gap\n{{ $('Related Work Summarization').item.json.output }}\n\nBelow are the summary of method or proposed algorithm\n{{ $json.output.content }}\n\nBelow are the related section in json format\n{{ $('Section Aggregator').item.json.result.toJsonString() }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a team member of research lab who doing research on RAG system.\nYou have to read an abstract and the summary of previous sections and the given related section in paper in order to summarize the key result and findings in this paper\n\nBelow are the example questions that you should follow below manner\n   - Summarize the key results or findings.\n   - Mention any benchmarks, metrics, or comparative studies presented.\n\nPlease be very detailed on this section\n\nAlso noted that, there will be image in each section, you can read the caption and choose some of them to show in your response\n\nPlease response in json format\n\n{\n\"content\": [\"list of summarization bullet\"],\n\"image\": [\"list of image url that related to your summarization, please choose only 1-2 images that is the most important\"]\n}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        2580,
+        1280
+      ],
+      "id": "f309ca75-af4e-4584-b54b-51bf0f042ef6",
+      "name": "Key Result Summarization",
+      "retryOnFail": true,
+      "waitBetweenTries": 3
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        1920
+      ],
+      "id": "490c547f-c4c6-4dfe-8e1a-71a4b0cea968",
+      "name": "OpenRouter Chat Model10",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ywJtRNsVX5D7vkiU",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "\n{\n  \"content\": [\"list of summarization bullet\"],\n  \"image\": [\"list of image url that related to your summarization\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2820,
+        1920
+      ],
+      "id": "3a29fffe-4849-454b-ad67-089e87059d7d",
+      "name": "Structured Output Parser7"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Below are an abstract of the paper\n{{ $('If html available (new method)').item.json.abstract }}\n\nBelow are the summarization of objective and problem statement of this paper\n{{ $('Objective Summarization').item.json.output.content }}\n\nBelow are the summarization of related work and research gap\n{{ $('Related Work Summarization').item.json.output.content }}\n\nBelow are the summarization of method\n{{ $('Methodology Summarization').item.json.output.content }}\n\nBelow are the summarization of key resul\nt{{ $json.output.content }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a team member of research lab who doing research on RAG system.\nYou have to read an abstract and the summary of each section in paper and analyse the application in the real-world business use-case of the propose algorithm or method \n\nBelow are the example questions that you should follow below manner\n   - List practical business use cases where this research could be applied.\n   - Be specific about the best scenario to use this method, if applicable.\n\nPlease response in json format\n{\n\"application\":[\"list of application in real world business (up to 5 use cases)\"]\n}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        2580,
+        1660
+      ],
+      "id": "fb4afcd1-7ff1-462e-9891-c7b8fa5cf0aa",
+      "name": "Application Analysis",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        3120,
+        1920
+      ],
+      "id": "11015233-aec0-47b1-b0c3-e6fc554f142b",
+      "name": "OpenRouter Chat Model11",
+      "credentials": {
+        "openRouterApi": {
+          "id": "ywJtRNsVX5D7vkiU",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{ \n  \"objective\": \"not exceed 20 words or 1 sentence\", \n  \"methodology\": \"please summarize only key idea not exceed 20 words or 1 sentence\",\n  \"result\": \"please summarize only key result not exceed 20 words or 1 sentence\",\n  \"application\": \"1 or 2 short bullets\",\n  \"keyword\": [\"list of important keywords or jargon in papers\"]\n\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        3360,
+        1960
+      ],
+      "id": "dbfbcd06-a589-44c9-bf82-11973d2a7eff",
+      "name": "Structured Output Parser8"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Below are an abstract of the paper\n{{ $('If html available (new method)').item.json.abstract }}\n\nBelow are the summarization of objective and problem statement of this paper\n{{ $('Objective Summarization').item.json.output.content }}\n\nBelow are the summarization of related work and research gap\n{{ $('Related Work Summarization').item.json.output.content }}\n\nBelow are the summarization of method\n{{ $('Methodology Summarization').item.json.output.content }}\n\nBelow are the summarization of key result\n{{ $('Key Result Summarization').item.json.output.content }}\n\nBelow are the summarization of real world application\n{{ $json.output.content }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Your role is to summarize each topic from the paper summarization  \nPlease answer in Json format \n{ \n  \"objective\": \"not exceed 20 words or 1 sentence\", \n  \"methodology\": \"please summarize only key idea not exceed 20 words or 1 sentence\",\n  \"result\": \"please summarize only key result not exceed 20 words or 1 sentence\",\n  \"application\": \"1 or 2 short bullets\",\n  \"keyword\": [\"list of important keywords or jargon in papers\"]\n}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        3020,
+        1660
+      ],
+      "id": "374067ba-2ed0-463e-be79-a13ff28df82d",
+      "name": "Overview Summarization",
+      "retryOnFail": true,
+      "waitBetweenTries": 3,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "205badeb-5995-80fe-9612-e65e6d38d295",
+          "mode": "list",
+          "cachedResultName": "RAG Survey",
+          "cachedResultUrl": "https://www.notion.so/205badeb599580fe9612e65e6d38d295"
+        },
+        "title": "={{ $('If html available (new method)').item.json.title }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Key Application|rich_text",
+              "textContent": "={{ $json.output.application }}"
+            },
+            {
+              "key": "Key Findings|rich_text",
+              "textContent": "={{ $json.output.result }}"
+            },
+            {
+              "key": "Name|title",
+              "title": "={{ $('If html available (new method)').item.json.title }}"
+            },
+            {
+              "key": "Key Ideas|rich_text",
+              "textContent": "={{ $json.output.methodology }}"
+            },
+            {
+              "key": "Survey Date|date",
+              "date": "={{ $now\t }}",
+              "timezone": "Asia/Bangkok"
+            },
+            {
+              "key": "Objective|rich_text",
+              "textContent": "={{ $json.output.objective }}"
+            },
+            {
+              "key": "Keywords|multi_select",
+              "multiSelectValue": "={{ $json.output.keyword }}"
+            },
+            {
+              "key": "Type|select",
+              "selectValue": "new method"
+            },
+            {
+              "key": "URL|url",
+              "urlValue": "={{ $('If html available (new method)').item.json.url }}"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_1",
+              "textContent": "={{ $('If html available (new method)').item.json.title }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3380,
+        1660
+      ],
+      "id": "32bceaee-a767-4fba-afbc-4c3011499a8b",
+      "name": "Create Notion Page and Add Header",
+      "credentials": {
+        "notionApi": {
+          "id": "MDFs8wP7MMES3DzZ",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_2",
+              "textContent": "Problem Statement and Objective"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3600,
+        1660
+      ],
+      "id": "02fa9ab3-7d79-488e-9b46-5dea9298a275",
+      "name": "Notion-Objective-Add Section Header",
+      "credentials": {
+        "notionApi": {
+          "id": "MDFs8wP7MMES3DzZ",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://notionapi:8000/append_notion_blocks",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=page_id",
+              "value": "={{ $('Create Notion Page and Add Header').item.json.id }}"
+            },
+            {
+              "name": "image_list",
+              "value": "={{ $('Objective Summarization').item.json.output.image }}"
+            },
+            {
+              "name": "bullet_list",
+              "value": "={{ $('Objective Summarization').item.json.output.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3820,
+        1660
+      ],
+      "id": "b87ca5bd-72d2-4cb3-8fd0-217f7620bc9a",
+      "name": "Notion - Objective - Append Section Block"
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $('Create Notion Page and Add Header').item.json.id }}",
+          "mode": "id"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_2",
+              "textContent": "Related Work"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3600,
+        1920
+      ],
+      "id": "14e5549a-9a6b-42a1-b59d-8b90afb393e0",
+      "name": "Notion-Related-Work-Add Section Header",
+      "credentials": {
+        "notionApi": {
+          "id": "MDFs8wP7MMES3DzZ",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://notionapi:8000/append_notion_blocks",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=page_id",
+              "value": "={{ $('Create Notion Page and Add Header').item.json.id }}"
+            },
+            {
+              "name": "image_list",
+              "value": "={{ $('Related Work Summarization').item.json.output.image }}"
+            },
+            {
+              "name": "bullet_list",
+              "value": "={{ $('Related Work Summarization').item.json.output.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3820,
+        1920
+      ],
+      "id": "8a7b784f-0294-4629-ba77-db54909ad39a",
+      "name": "Notion - Related Work - Append Section Block"
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $('Create Notion Page and Add Header').item.json.id }}",
+          "mode": "id"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_2",
+              "textContent": "Methodology"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3600,
+        2160
+      ],
+      "id": "2b6296ae-111a-4af4-a67b-51c8f5e3a9d1",
+      "name": "Notion-Methodology-Add Section Header",
+      "credentials": {
+        "notionApi": {
+          "id": "MDFs8wP7MMES3DzZ",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://notionapi:8000/append_notion_blocks",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=page_id",
+              "value": "={{ $('Create Notion Page and Add Header').item.json.id }}"
+            },
+            {
+              "name": "image_list",
+              "value": "={{ $('Methodology Summarization').item.json.output.image }}"
+            },
+            {
+              "name": "bullet_list",
+              "value": "={{ $('Methodology Summarization').item.json.output.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3820,
+        2160
+      ],
+      "id": "7ccdb93e-c75e-4e83-bb46-dc2c8d4fd366",
+      "name": "Notion - Methodology - Append Section Block"
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $('Create Notion Page and Add Header').item.json.id }}",
+          "mode": "id"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_2",
+              "textContent": "Result"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3600,
+        2400
+      ],
+      "id": "024b113e-e8e5-43ae-a95a-6fb645f4e096",
+      "name": "Notion-Result-Add Section Header",
+      "credentials": {
+        "notionApi": {
+          "id": "MDFs8wP7MMES3DzZ",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://notionapi:8000/append_notion_blocks",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=page_id",
+              "value": "={{ $('Create Notion Page and Add Header').item.json.id }}"
+            },
+            {
+              "name": "image_list",
+              "value": "={{ $('Key Result Summarization').item.json.output.image }}"
+            },
+            {
+              "name": "bullet_list",
+              "value": "={{ $('Key Result Summarization').item.json.output.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3820,
+        2400
+      ],
+      "id": "5770e34a-2682-4ce9-bcb6-a8ca205c78fe",
+      "name": "Notion - Result - Append Section Block"
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $('Create Notion Page and Add Header').item.json.id }}",
+          "mode": "id"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_2",
+              "textContent": "Applications"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3600,
+        2620
+      ],
+      "id": "ca4cc41f-6242-4fd1-a996-fc0fba7336c7",
+      "name": "Notion-Application-Add Section Header1",
+      "credentials": {
+        "notionApi": {
+          "id": "MDFs8wP7MMES3DzZ",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://notionapi:8000/append_notion_blocks",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=page_id",
+              "value": "={{ $('Create Notion Page and Add Header').item.json.id }}"
+            },
+            {
+              "name": "image_list",
+              "value": "={{ $('Application Analysis').item.json.output.image }}"
+            },
+            {
+              "name": "bullet_list",
+              "value": "={{ $('Application Analysis').item.json.output.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3820,
+        2620
+      ],
+      "id": "bc4e554b-0caa-4395-921f-b10ed193dcc7",
+      "name": "Notion - Result - Append Section Block2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "typeVersion": 1,
+      "position": [
+        3180,
+        1820
+      ],
+      "id": "0fc1b202-3d34-4803-9afe-df8f8a204067",
+      "name": "Auto-fixing Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "typeVersion": 1,
+      "position": [
+        2820,
+        1020
+      ],
+      "id": "df8f30be-c084-4638-b18d-26c02c215ee3",
+      "name": "Auto-fixing Output Parser1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        1800
+      ],
+      "id": "84bfef4c-ba58-4a5c-9af8-2b39994c2452",
+      "name": "Auto-fixing Output Parser2"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "If html available (new method)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "If html available (bechmark)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If html available (new method)": {
+      "main": [
+        [
+          {
+            "node": "Topic Segmentation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If html available (bechmark)": {
+      "main": [
+        []
+      ]
+    },
+    "OpenRouter Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Topic Segmentation",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Topic Segmentation",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Topic Segmentation": {
+      "main": [
+        [
+          {
+            "node": "Section Aggregator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Section Aggregator": {
+      "main": [
+        [
+          {
+            "node": "Objective Summarization",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Objective Summarization",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Objective Summarization",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Objective Summarization": {
+      "main": [
+        [
+          {
+            "node": "Related Work Summarization",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model7": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Related Work Summarization",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Related Work Summarization",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Related Work Summarization": {
+      "main": [
+        [
+          {
+            "node": "Methodology Summarization",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model8": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Methodology Summarization",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Auto-fixing Output Parser1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser5": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Auto-fixing Output Parser1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Methodology Summarization": {
+      "main": [
+        [
+          {
+            "node": "Key Result Summarization",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model9": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Key Result Summarization",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser6": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Key Result Summarization",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Key Result Summarization": {
+      "main": [
+        [
+          {
+            "node": "Application Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model10": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Application Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Auto-fixing Output Parser2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser7": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Auto-fixing Output Parser2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Application Analysis": {
+      "main": [
+        [
+          {
+            "node": "Overview Summarization",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model11": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Overview Summarization",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser8": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Overview Summarization": {
+      "main": [
+        [
+          {
+            "node": "Create Notion Page and Add Header",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Notion Page and Add Header": {
+      "main": [
+        [
+          {
+            "node": "Notion-Objective-Add Section Header",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion-Objective-Add Section Header": {
+      "main": [
+        [
+          {
+            "node": "Notion - Objective - Append Section Block",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion - Objective - Append Section Block": {
+      "main": [
+        [
+          {
+            "node": "Notion-Related-Work-Add Section Header",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion-Related-Work-Add Section Header": {
+      "main": [
+        [
+          {
+            "node": "Notion - Related Work - Append Section Block",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion - Related Work - Append Section Block": {
+      "main": [
+        [
+          {
+            "node": "Notion-Methodology-Add Section Header",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion-Methodology-Add Section Header": {
+      "main": [
+        [
+          {
+            "node": "Notion - Methodology - Append Section Block",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion - Methodology - Append Section Block": {
+      "main": [
+        [
+          {
+            "node": "Notion-Result-Add Section Header",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion-Result-Add Section Header": {
+      "main": [
+        [
+          {
+            "node": "Notion - Result - Append Section Block",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion - Result - Append Section Block": {
+      "main": [
+        [
+          {
+            "node": "Notion-Application-Add Section Header1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion-Application-Add Section Header1": {
+      "main": [
+        [
+          {
+            "node": "Notion - Result - Append Section Block2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-fixing Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Overview Summarization",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-fixing Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Methodology Summarization",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-fixing Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Application Analysis",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "60d22ded35b77228d2da67ad1190019108902137ff75357a9d033fe49f5c23f7"
+  }
+}

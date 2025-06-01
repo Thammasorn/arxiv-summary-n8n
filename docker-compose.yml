@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./test/:/test/
+      - ./local-files:/files
+    restart: unless-stopped
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=securepassword
+  arxivapi:
+    build:
+      context: ./arxiv_api   # path to the folder containing the Dockerfile
+      dockerfile: Dockerfile  # optional if the file is named Dockerfile
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+  notionapi:
+    build: ./notion_api
+    env_file:
+      - notion_api/.env
+    ports:
+      - "8001:8000"
+volumes:
+  n8n_data:
