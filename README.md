@@ -36,3 +36,5 @@ docker-compose up
 ## Todo
 
 [] Add logic to check if a paper has already been summarized and skip it if it exists in the Notion page.
+
+[] extract github repo from each paper (if any)
